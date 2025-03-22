@@ -98,7 +98,7 @@ app.use('/api', limiter); // limiting the number of requests to the API
 // Stripe webhook, BEFORE body-parser, because stripe needs the body as stream
 app.post(
   '/webhook-checkout',
-  // express.raw({ type: 'application/json' }),
+  express.raw({ type: 'application/json' }),
   bookingController.webhookCheckout
 );
 
