@@ -9,6 +9,7 @@ const hpp = require('hpp');
 const { request, get } = require('http');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const cors = require('cors');
 
 const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./utils/appError');
@@ -31,6 +32,12 @@ app.set('view engine', 'pug'); // setting the view engine to pug
 app.set('views', path.join(__dirname, 'views')); // setting the views directory
 
 // 1. GLOBAL MIDDLEWARES
+// Implement CORS
+app.use(cors());
+// Access-Control-Allow-Origin *
+
+app.options('*', cors()); // pre-flight phase
+
 // Serving static files
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser()); // Parse data from cookies
