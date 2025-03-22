@@ -26,27 +26,24 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
 
-    line_items: [
-      {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: `${tour.name} Tour`,
-            description: tour.summary,
-            images: [
-              `${req.protocol}://${req.get('host')}/img/tours/${
-                tour.imageCover
-              }`,
-            ],
-          },
-          unit_amount: tour.price * 100,
+    line_items: {
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: `${tour.name} Tour`,
+          description: tour.summary,
+          images: [
+            `${req.protocol}://${req.get('host')}/img/tours/${tour.imageCover}`,
+          ],
         },
-        quantity: 1,
         unit_amount: tour.price * 100,
-        // images: [`https://natours.dev/img/tours/${tour.imageCover}`],
-        // price: tour.price * 100,
       },
-    ],
+      quantity: 1,
+
+      // images: [`https://natours.dev/img/tours/${tour.imageCover}`],
+      // price: tour.price * 100,
+    },
+
     mode: 'payment',
     // line_items: [
     //   {
@@ -79,7 +76,8 @@ const createBookingCheckout = async (session) => {
   const tour = session.client_reference_id;
   const user = (await User.findOne({ email: session.customer_email })).id;
 
-  const price = session.line_items[0].unit_amount / 100;
+  const price = session.line_items.price_data.unit_amount / 100;
+  console.log(`Disputed Price: ${price} `);
   // const price = 100;
   await Booking.create({ tour, user, price });
 };
