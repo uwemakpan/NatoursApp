@@ -99,7 +99,7 @@ app.use('/api', limiter); // limiting the number of requests to the API
 app.post(
   '/webhook-checkout',
   express.raw({ type: 'application/json' }),
-  bookingController.webhookCheckout
+  bookingController.webhookCheckout()
 );
 
 // informing the app to use the express.json middleware
