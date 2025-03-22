@@ -35,3 +35,12 @@ process.on('unhandledRejection', (err) => {
   // console.log(err.name, err.message);
   server.close(() => process.exit(1));
 });
+
+// shutting down the server gracefully when a SIGTERM signal is received
+// SIGTERM is a signal that is sent to request a program to terminate
+process.on('SIGTERM', () => {
+  console.log('👋 SIGTERM RECEIVED. Shutting down gracefully');
+  server.close(() => {
+    console.log('💥 Process terminated!');
+  });
+});

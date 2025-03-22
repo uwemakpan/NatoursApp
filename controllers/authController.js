@@ -14,18 +14,20 @@ const signToken = (id) => {
 };
 
 // Function to send token to client
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
-  const cookieOptions = {
+
+  // ensure that the cookie is only sent on an encrypted connection
+  // if (req.secure || req.headers['x-forwarded-proto'] === 'https')
+  //   cookieOptions.secure = true;
+
+  res.cookie('jwt', token, {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     httpOnly: true, // cookie cannot be accessed or modified in any way by the browser
-  };
-
-  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-
-  res.cookie('jwt', token, cookieOptions); // send token via cookie
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+  }); // send token via cookie
 
   user.password = undefined; // remove password from output
 
@@ -52,7 +54,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   // initiating an email after signup
   await new Email(newUser, url).sendWelcome();
-  createSendToken(newUser, 201, res);
+  createSendToken(newUser, 201, req, res);
 });
 
 // logging in an existing user
@@ -74,7 +76,7 @@ exports.login = catchAsync(async (req, res, next) => {
   // console.log(`User Data Info: `, req.headers.cookie);
 
   // 3 If everything is ok, send token to client
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });
 
 // logging out a user
@@ -273,7 +275,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 4) Log the user in, send JWT
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });
 
 // middleware to update password
@@ -292,5 +294,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 4) Log user in, send JWT
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });

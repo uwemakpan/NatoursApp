@@ -19,6 +19,7 @@ const bookingRouter = require('./routes/bookingRoutes');
 const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
+app.enable('trust proxy'); // enabling the proxy
 // sending a get request to the root URL
 // app.get('/', (req, res) => {
 //   res
