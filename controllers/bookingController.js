@@ -63,6 +63,10 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     session,
+    data: {
+      tour,
+      line_items: session.line_items,
+    },
   });
 });
 
@@ -79,7 +83,8 @@ const createBookingCheckout = async (session) => {
   const tour = session.client_reference_id;
   const user = (await User.findOne({ email: session.customer_email })).id;
 
-  const price = line_items.price_data.unit_amount;
+  // const price = session.line_items[0].amount / 100;
+  const price = 40000;
 
   // const price = 100;
   await Booking.create({ tour, user, price });
